@@ -1,5 +1,5 @@
 //elements
-const todolistContent = document.querySelector(`.todolist_content`);
+const todolistContent = document.querySelector('.todolist_content');
 const addtodoInput = document.querySelector('.add-todo_input');
 const addtodoBtn = document.querySelector('.add-todo_btn');
 
@@ -42,14 +42,38 @@ function addAddTodoEvent() {
     )
 }   //End of addAddTodoEvent
 
+function addTodoActionEvent(){
+    todolistContent.addEventListener(
+        'click',
+        (e)=>{
+            console.log("click", e.target.className, parseTodoIdFromBtn(e.target));
+            if(e.target.className === 'btn-remove'){
+                //remove the item
+                alert('remove');
+                const currentID = parseTodoIdFromBtn(e.target);
+                console.log("Current id = " + currentID);
+                fetch('https://jsonplaceholder.typicode.com/todos/${currentID)}', {
+                    method: 'DELETE',
+                })
+                .then((res) => {
+                    return res.json();
+                })
+                .then((data) => {
+                    console.log(data);
+                    todos = todos.filter((todo)=>todo.id !== currentID)
+                })
+                
+            }
+        })
+}
 
 
 //data
 let todos = [];
 
 //init
-
-addAddTodoEvent();  //giving me problems
+addAddTodoEvent();
+addTodoActionEvent();
 
 fetch('https://jsonplaceholder.typicode.com/todos')
     .then((response) => response.json())
@@ -79,9 +103,14 @@ function generateTodoTmp(todo) {
     <span class="content-item_title">${todo.title}</span>
     <div class="content-item_actions">
         <button>Edit</button>
-        <button>X</button>
+        <button class="btn-remove" id="${todo.id}">X</button>
     </div>
     </li>`;
+}
+
+//helper
+function parseTodoIdFromBtn(btnElement){
+    return 0+btnElement.id.substring(5)
 }
 
 
