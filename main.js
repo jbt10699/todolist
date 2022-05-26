@@ -1,10 +1,11 @@
 //elements
 const todolistContent = document.querySelector(`.todolist_content`);
-const addtodoInput = document.querySelector(`add-todo_input`);
-const addtodoBtn = document.querySelector(`add-todo_btn`);
+const addtodoInput = document.querySelector('.add-todo_input');
+const addtodoBtn = document.querySelector('.add-todo_btn');
+
 
 //setevent
-function addAddTodoEvent(){
+function addAddTodoEvent() {
     /*
     addtodoInput.addEventListener('keypress',
         (e)=>{
@@ -12,15 +13,34 @@ function addAddTodoEvent(){
         }
     );
     */
-
     addtodoBtn.addEventListener(
         'click',
-        ()=>{
-            console.log('clc');
+        () => {
+            fetch(
+                'https://jsonplaceholder.typicode.com/todos',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        userId: 1,
+                        title: addtodoInput.value,
+                        completed: false,
+                    }),
+                    headers: {
+                        'Content-type':
+                            'application/json; charset=UTF-8',
+                    },
+                }
+            )
+                .then((response) => response.json())
+                .then((newTodo) => {
+                    console.log(newTodo);
+                    todos = [newTodo, ...todos];
+                    renderTodoList(todos);
+                })
+
         }
     )
-
-}
+}   //End of addAddTodoEvent
 
 
 
@@ -28,7 +48,9 @@ function addAddTodoEvent(){
 let todos = [];
 
 //init
-//addAddTodoEvent();
+
+addAddTodoEvent();  //giving me problems
+
 fetch('https://jsonplaceholder.typicode.com/todos')
     .then((response) => response.json())
     .then((json) => {
@@ -39,20 +61,20 @@ fetch('https://jsonplaceholder.typicode.com/todos')
 
 
 //Single responsibility principle. Keep functions simple
-function renderTodoList(todos){
+function renderTodoList(todos) {
     const todolistTmp = generateTodoListTmp(todos);
     render(todolistTmp, todolistContent);
 }
 
 //Templates
-function generateTodoListTmp(todos){
-    let res = todos.map(todo=>{
+function generateTodoListTmp(todos) {
+    let res = todos.map(todo => {
         return generateTodoTmp(todo);
     }).join('');
     return res;
 }
 
-function generateTodoTmp(todo){
+function generateTodoTmp(todo) {
     return `<li class="todolist_content-item">
     <span class="content-item_title">${todo.title}</span>
     <div class="content-item_actions">
@@ -64,7 +86,7 @@ function generateTodoTmp(todo){
 
 
 //render
-function render(template, element){
+function render(template, element) {
     element.innerHTML = template;
 }
 
